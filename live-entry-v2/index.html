@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Live Results - INAC 2018</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" charset="utf-8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+  <script type="text/javascript" src="http://livejs.com/live.js"></script>
+</head>
+
+<style media="screen">
+  html {
+    scroll-behavior: smooth;
+  }
+  .heading {
+    border-bottom: 1px solid black;
+    margin-bottom: 20px;
+    margin-top: 10px;
+  }
+  .img {
+    margin-top: 10px;
+
+  }
+  marquee {
+    height: 600px;
+  }
+  #employee1_table {
+    overflow-y: scroll;
+    height: 30em;
+  }
+  #employee2_table {
+    overflow-y: scroll;
+    height: 30em;
+  }
+  #table1 {
+    overflow-y: scroll;
+  }
+  #table2 {
+    overflow-y: scroll;
+  }
+
+</style>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-2 img">
+        <img name="load_data" id="load_data" class="img img-fluid" src="TCAS4_01.jpg" align="left">
+      </div>
+      <div class="col-8 heading">
+        <h1 class="text-center">9th TCAS AUTOX 2018</h1>
+        <h1 class="text-center">Finals</h1>
+      </div>
+      <div class="col-2 img">
+        <img class="img img-fluid" src="TCAS4_01.jpg" alt="" align="right">
+      </div>
+      <div class="col-md-6">
+        <h3 class="text-center text-danger">Category Wise, Time Wise</h3>
+          <div id="employee1_table" onmousedown="pauseDiv" onmouseup="resumeDiv">
+          </div>
+      </div>
+      <div class="col-md-6">
+        <h3 class="text-center text-danger">Name Wise</h3>
+          <div id="employee2_table" onmousedown="pauseDiv" onmouseup="resumeDiv">
+          </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script src="./jquery.tablesorter.min.js" charset="utf-8"></script>
+<script>
+
+function loadData(callback) {
+      $.ajax({
+        url: "./test.csv",
+        dataType: "text",
+        success: function(data) {
+          var employee_data = data.split(/\r?\n|\r/);
+          var table_data = '<table id="categorywise" class="table tablesorter table-bordered table-striped table-fixed table-responsive-sm text-center"> <thead class="thead-light"><tr><th id="category">Category</th><th>Competition No.</th><th>Race No.</th><th id="time">Time</th><th>Name</th></tr></thead><tbody id="table1">';
+          for (var count = 0; count < employee_data.length; count++) {
+            var cell_data = employee_data[count].split(",");
+            table_data += '<tr>';
+            for (var cell_count = 0; cell_count < cell_data.length; cell_count++) {
+              var data = cell_data[cell_count].replace(/["]/g, '');
+              if (count === 0) {
+                table_data += '<td>' + data.trim() + '</td>';
+              } else {
+                table_data += '<td>' + data.trim() + '</td>';
+              }
+            }
+            table_data += '</tr>';
+          }
+          table_data += '</tbody>';
+          table_data += '</table>';
+          $('#employee1_table').html(table_data);
+        }
+      });
+
+      $.ajax({
+        url: "./test.csv",
+        dataType: "text",
+        success: function(data) {
+          var employee_data = data.split(/\r?\n|\r/);
+          var table_data = '<table id="namewise" class="table tablesorter table-bordered table-striped table-fixed table-responsive-sm text-center"> <thead class="thead-light"><tr><th>Category</th><th>Competition No.</th><th>Race No.</th><th>Time</th><th id="name">Name</th></tr></thead><tbody id="table1">';
+          for (var count = 0; count < employee_data.length; count++) {
+            var cell_data = employee_data[count].split(",");
+            table_data += '<tr>';
+                for (var cell_count = 0; cell_count < cell_data.length; cell_count++) {
+              var data = cell_data[cell_count].replace(/["]/g, '');
+              if (count === 0) {
+                table_data += '<td>' + data.trim() + '</td>';
+              } else {
+                table_data += '<td>' + data.trim() + '</td>';
+              }
+            }
+            table_data += '</tr>';
+          }
+          table_data += '</tbody>';
+          table_data += '</table>';
+          $('#employee2_table').html(table_data);
+        }
+      });
+      callback();
+    }
+
+  function sort() {
+    $("#namewise").tablesorter({
+      sortList: [[4,0]]
+    });
+    $("#categorywise").tablesorter({
+      sortList: [[0,0],[3,0]]
+    });
+    // $("#category,#time").click();
+    // $("#name").click();
+  }
+
+  function pauseDiv() {
+  	clearInterval(ScrollInterval);
+  }
+
+  function resumeDiv() {
+  	PreviousScrollTop1 = DivElmnt1.scrollTop;
+    PreviousScrollTop2 = DivElmnt2.scrollTop;
+
+  	ScrollInterval = setInterval('scrollDiv()', ScrollRate);
+  }
+
+  function reloadData() {
+    pauseDiv();
+    loadData();
+    setTimeout(sort,1000);
+  }
+
+  setTimeout(sort,1000);
+
+  ScrollRate = 30;
+  function scrollDiv_init() {
+  	DivElmnt1 = document.getElementById('employee1_table');
+    DivElmnt2 = document.getElementById('employee2_table');
+
+  	ReachedMaxScroll1 = false;
+    ReachedMaxScroll2 = false;
+
+  	DivElmnt1.scrollTop = 0;
+    DivElmnt2.scrollTop = 0;
+
+    PreviousScrollTop1  = 0;
+    PreviousScrollTop2  = 0;
+
+  	ScrollInterval = setInterval('scrollDiv()', ScrollRate);
+  }
+
+  function scrollDiv() {
+
+  	if (!ReachedMaxScroll1) {
+  		DivElmnt1.scrollTop = PreviousScrollTop1;
+  		PreviousScrollTop1++;
+
+  		ReachedMaxScroll1 = DivElmnt1.scrollTop >= (DivElmnt1.scrollHeight - DivElmnt1.offsetHeight);
+  	}
+  	else {
+      // reloadData();
+      // window.location.reload();
+  		ReachedMaxScroll1 = (DivElmnt1.scrollTop == 0)?false:true;
+
+  		DivElmnt1.scrollTop = PreviousScrollTop1;
+  		PreviousScrollTop1--;
+      // resumeDiv();
+  	}
+    if (!ReachedMaxScroll2) {
+  		DivElmnt2.scrollTop = PreviousScrollTop2;
+  		PreviousScrollTop2++;
+
+  		ReachedMaxScroll2 = DivElmnt2.scrollTop >= (DivElmnt2.scrollHeight - DivElmnt2.offsetHeight);
+  	}
+  	else {
+      // reloadData();
+      // window.location.reload();
+  		ReachedMaxScroll2 = (DivElmnt2.scrollTop == 0)?false:true;
+
+  		DivElmnt2.scrollTop = PreviousScrollTop2;
+  		PreviousScrollTop2--;
+      // resumeDiv();
+  	}
+  }
+  $(document).ready(function() {
+    loadData(scrollDiv_init);
+  });
+  // scrollDiv_init();
+  $('#load_data').click(scrollDiv_init);
+
+
+</script>
+</body>
+</html>
